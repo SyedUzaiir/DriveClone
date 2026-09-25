@@ -12,8 +12,16 @@ app.set('views', './views')
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
+    res.sendStatus(204)
+})
+
 app.get('/', (req, res) => {
     res.render('index')
+})
+
+app.get('/register', (req, res) => {
+    res.redirect('/user/register')
 })
 
 app.use('/user',userRouter)
