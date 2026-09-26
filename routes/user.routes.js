@@ -68,7 +68,7 @@ router.post('/login',
             username : username
         })
 
-        if(!user){
+        if(!user){ 
             return res.status(400).json({
                 message:' username or password is incorrect'
             })
@@ -76,7 +76,7 @@ router.post('/login',
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
-            return res.status(400),json({
+            return res.status(400).json({
                 message: 'username or password is incorrect'
             })
         }
@@ -87,7 +87,10 @@ router.post('/login',
             username: user.username
         }, process.env.JWT_SECRET,
         )
-
+        
+        res.json({
+            token
+        })
 
     }
 
