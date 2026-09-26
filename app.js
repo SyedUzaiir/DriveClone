@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config();
 const connectToDB = require('./config/db');
 const cookieParser = require('cookie-parser');
+const indexRouter = require('./routes/index.routes');
 connectToDB();
 
 const app = express()
@@ -26,7 +27,7 @@ app.get('/register', (req, res) => {
     res.redirect('/user/register')
 })
 
-
+app.use('/',indexRouter)
 app.use('/user',userRouter) //should use /user as parent route!!
 
 app.listen(3000,()=>{

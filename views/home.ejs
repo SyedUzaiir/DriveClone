@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Drive Clone</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Hidden File Input -->
+    <input
+        type="file"
+        id="fileInput"
+        class="hidden"
+        multiple
+    >
+
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <svg
+                        class="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 15a4 4 0 004 4h9a5 5 0 100-10h-1.26A8 8 0 103 15z"
+                        />
+                    </svg>
+                </div>
+
+                <h1 class="text-xl font-semibold text-gray-800">
+                    Drive Clone
+                </h1>
+            </div>
+
+
+            <!-- Upload Button -->
+            <button
+                id="uploadButton"
+                type="button"
+                class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition duration-200 shadow-sm"
+            >
+                <span class="text-lg">+</span>
+                Upload File
+            </button>
+
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <!-- Heading -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800">
+                My Drive
+            </h2>
+
+            <p class="text-gray-500 mt-1">
+                Upload and manage your files
+            </p>
+        </div>
+
+
+        <!-- Drag & Drop Area -->
+        <div
+            id="dropArea"
+            class="w-full min-h-[400px] bg-white border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center hover:border-blue-400 transition duration-200 cursor-pointer"
+        >
+
+            <!-- Upload Icon -->
+            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5">
+
+                <svg
+                    class="w-10 h-10 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.8"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 0116.9 6H17a4 4 0 010 8h-1m-6-4l3-3m0 0l3 3m-3-3v12"
+                    />
+                </svg>
+
+            </div>
+
+
+            <!-- Main Text -->
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                Drag & Drop your files here
+            </h3>
+
+            <p class="text-gray-500 mb-6">
+                or click the button below to browse your files
+            </p>
+
+
+            <!-- Browse Button -->
+            <button
+                id="browseButton"
+                type="button"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition duration-200"
+            >
+                Browse Files
+            </button>
+
+
+            <!-- File Information -->
+            <p class="text-sm text-gray-400 mt-5">
+                You can upload multiple files
+            </p>
+
+        </div>
+
+
+        <!-- Selected Files -->
+        <div id="fileList" class="mt-6 hidden">
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                Selected Files
+            </h3>
+
+            <div
+                id="fileNames"
+                class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100"
+            >
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- JavaScript -->
+    <script>
+
+        const fileInput = document.getElementById("fileInput");
+        const uploadButton = document.getElementById("uploadButton");
+        const browseButton = document.getElementById("browseButton");
+        const dropArea = document.getElementById("dropArea");
+
+        const fileList = document.getElementById("fileList");
+        const fileNames = document.getElementById("fileNames");
+
+
+        // Upload File button
+        uploadButton.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+
+        // Browse Files button
+        browseButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            fileInput.click();
+        });
+
+
+        // Clicking anywhere on drop area
+        dropArea.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+
+        // Files selected from file picker
+        fileInput.addEventListener("change", () => {
+
+            if (fileInput.files.length > 0) {
+                displayFiles(fileInput.files);
+            }
+
+        });
+
+
+        // Drag over
+        dropArea.addEventListener("dragover", (event) => {
+
+            event.preventDefault();
+
+            dropArea.classList.remove("border-gray-300");
+            dropArea.classList.add(
+                "border-blue-500",
+                "bg-blue-50"
+            );
+
+        });
+
+
+        // Drag leave
+        dropArea.addEventListener("dragleave", () => {
+
+            dropArea.classList.remove(
+                "border-blue-500",
+                "bg-blue-50"
+            );
+
+            dropArea.classList.add("border-gray-300");
+
+        });
+
+
+        // Drop files
+        dropArea.addEventListener("drop", (event) => {
+
+            event.preventDefault();
+
+            dropArea.classList.remove(
+                "border-blue-500",
+                "bg-blue-50"
+            );
+
+            dropArea.classList.add("border-gray-300");
+
+            const files = event.dataTransfer.files;
+
+            if (files.length > 0) {
+                displayFiles(files);
+            }
+
+        });
+
+
+        // Display selected files
+        function displayFiles(files) {
+
+            fileNames.innerHTML = "";
+
+            fileList.classList.remove("hidden");
+
+            Array.from(files).forEach((file) => {
+
+                const fileItem = document.createElement("div");
+
+                fileItem.className =
+                    "flex items-center justify-between px-5 py-4";
+
+                fileItem.innerHTML = `
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+
+                            <svg
+                                class="w-5 h-5 text-blue-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                            </svg>
+
+                        </div>
+
+                        <div>
+                            <p class="font-medium text-gray-800">
+                                ${file.name}
+                            </p>
+
+                            <p class="text-sm text-gray-400">
+                                ${formatFileSize(file.size)}
+                            </p>
+                        </div>
+
+                    </div>
+                `;
+
+                fileNames.appendChild(fileItem);
+
+            });
+
+        }
+
+
+        // Format file size
+        function formatFileSize(bytes) {
+
+            if (bytes === 0) return "0 Bytes";
+
+            const units = [
+                "Bytes",
+                "KB",
+                "MB",
+                "GB"
+            ];
+
+            const index = Math.floor(
+                Math.log(bytes) / Math.log(1024)
+            );
+
+            return (
+                parseFloat(
+                    (bytes / Math.pow(1024, index)).toFixed(2)
+                )
+                + " "
+                + units[index]
+            );
+
+        }
+
+    </script>
+
+</body>
+</html>
