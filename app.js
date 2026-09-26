@@ -24,7 +24,7 @@ app.get('/register', (req, res) => {
     res.redirect('/user/register')
 })
 
-app.use('/user',userRouter)
+app.use('/user',userRouter) //should use /user as parent route!!
 
 app.listen(3000,()=>{
     console.log("Server is running on port 3000")
