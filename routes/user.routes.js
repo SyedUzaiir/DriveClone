@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { body, validationResult } = require('express-validator');
 const userModel = require('../models/user.model')
-
+const bcrypt = require('bcrypt');
 
 // router.get('/test', (req,res)=>{
 //     res.send('user Test route')
@@ -26,12 +26,14 @@ router.post('/register',
         }
 
         const {email,username,password} = req.body;
+        
+        const hashPassword = await bcrypt.hash(password, 10);
 
         try{
             const newUser = await userModel.create({
                 email,
                 username,
-                password
+                password: hashPassword
             })
 
             return res.status(201).json(newUser)
@@ -42,6 +44,10 @@ router.post('/register',
 
     // // console.log(req.body);
     // res.send(errors)
+})
+
+router.post('/login',(req,res)=>{
+    res.render('/login');
 })
 
 

@@ -24,6 +24,7 @@ app.get('/register', (req, res) => {
     res.redirect('/user/register')
 })
 
+
 app.use('/user',userRouter) //should use /user as parent route!!
 
 app.listen(3000,()=>{
