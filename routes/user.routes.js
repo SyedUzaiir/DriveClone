@@ -126,7 +126,7 @@ router.post(
                 maxAge: 24 * 60 * 60 * 1000
             });
 
-            return res.send('Logged In');
+            return res.redirect('/home');
         } catch (err) {
             console.error('Login error:', err.message);
 
