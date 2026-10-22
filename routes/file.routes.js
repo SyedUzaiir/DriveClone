@@ -110,4 +110,36 @@ router.post(
     }
 );
 
+
+/**
+ * Get files belonging to the currently logged-in user.
+ * Mounted at GET /files in app.js.
+ */
+router.get('/', authMiddleware, async (req, res) => {
+    try {
+        const files = await File.find({
+            owner: req.user.userId
+        })
+            .select('originalName mimeType size createdAt')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        return res.status(200).json({
+            files: files.map(file => ({
+                id: file._id,
+                name: file.originalName,
+                mimeType: file.mimeType,
+                size: file.size,
+                uploadedAt: file.createdAt
+            }))
+        });
+    } catch (error) {
+        console.error('List files error:', error.message);
+
+        return res.status(500).json({
+            message: 'Unable to retrieve files.'
+        });
+    }
+});
+
 module.exports = router;
