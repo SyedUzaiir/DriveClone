@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = require('./routes/user.routes');
+const fileRouter = require('./routes/file.routes');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get('/register', (req, res) => {
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/files', fileRouter);
 
 // Start the database first, then the server
 async function startServer() {
