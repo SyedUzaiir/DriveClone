@@ -338,6 +338,7 @@
             item.className =
               "flex items-center justify-between gap-4 px-5 py-4";
 
+            // File details
             const details = document.createElement("div");
             details.className = "min-w-0";
 
@@ -355,7 +356,21 @@
 
             details.appendChild(name);
             details.appendChild(info);
+
+            // Download button
+            const downloadButton = document.createElement("button");
+            downloadButton.type = "button";
+            downloadButton.className =
+              "shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700";
+            downloadButton.textContent = "Download";
+
+            downloadButton.addEventListener("click", () => {
+              window.location.href = `/files/${encodeURIComponent(file.id)}/download`;
+            });
+
+            // Add details and button to the file row
             item.appendChild(details);
+            item.appendChild(downloadButton);
 
             savedFilesList.appendChild(item);
           });
@@ -364,9 +379,10 @@
         }
       }
 
+      // Refresh button
       refreshFilesButton.addEventListener("click", loadSavedFiles);
 
-      // Load saved files when the page opens.
+      // Load saved files when the page opens
       loadSavedFiles();
 
       async function uploadSelectedFiles() {

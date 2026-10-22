@@ -6,7 +6,10 @@ const path = require('path');
 
 const authMiddleware = require('../middleware/auth.middleware');
 const File = require('../models/file.model');
-const { uploadFile } = require('../services/s3.service');
+const {
+    uploadFile,
+    getDownloadUrl
+} = require('../services/s3.service');
 
 const router = express.Router();
 
@@ -141,5 +144,45 @@ router.get('/', authMiddleware, async (req, res) => {
         });
     }
 });
+
+
+/**
+ * Generate a temporary download URL for an owned file.
+ * GET /files/:id/download
+ */
+router.get('/:id/download', authMiddleware, async (req, res) => {
+    try {
+        const file = await File.findOne({
+            _id: req.params.id,
+            owner: req.user.userId
+        }).lean();
+
+        if (!file) {
+            return res.status(404).json({
+                message: 'File not found.'
+            });
+        }
+
+        const downloadUrl = await getDownloadUrl({
+            key: file.s3Key,
+            downloadName: file.originalName
+        });
+
+        return res.redirect(downloadUrl);
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(404).json({
+                message: 'File not found.'
+            });
+        }
+
+        console.error('File download error:', error.message);
+
+        return res.status(500).json({
+            message: 'Unable to download file.'
+        });
+    }
+});
+
 
 module.exports = router;
