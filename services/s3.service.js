@@ -1,5 +1,11 @@
 
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const {
+    S3Client,
+    PutObjectCommand,
+    GetObjectCommand
+} = require('@aws-sdk/client-s3');
+
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { fromIni } = require('@aws-sdk/credential-providers');
 
 const s3 = new S3Client({
@@ -27,8 +33,21 @@ async function uploadFile({ key, body, contentType }) {
     };
 }
 
+async function getDownloadUrl({ key, downloadName }) {
+    const command = new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        ResponseContentDisposition: `attachment; filename="${downloadName.replace(/["\\\r\n]/g, '_')}"`
+    });
+
+    return getSignedUrl(s3, command, {
+        expiresIn: 60
+    });
+}
+
 module.exports = {
     s3,
     uploadFile,
+    getDownloadUrl,
     BUCKET_NAME
 };

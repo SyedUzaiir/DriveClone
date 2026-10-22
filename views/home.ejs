@@ -137,6 +137,30 @@
           Upload Selected Files
         </button>
       </div>
+
+      <!-- Files already saved in My Drive -->
+      <section class="mt-10">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">My Files</h3>
+
+          <button
+            id="refreshFilesButton"
+            type="button"
+            class="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <p id="savedFilesStatus" class="text-sm text-gray-500 mb-3">
+          Loading your files...
+        </p>
+
+        <div
+          id="savedFilesList"
+          class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100"
+        ></div>
+      </section>
     </main>
 
     <!-- Upload Status -->
@@ -157,6 +181,9 @@
       const fileList = document.getElementById("fileList");
       const fileNames = document.getElementById("fileNames");
       const uploadStatus = document.getElementById("uploadStatus");
+      const savedFilesList = document.getElementById("savedFilesList");
+      const savedFilesStatus = document.getElementById("savedFilesStatus");
+      const refreshFilesButton = document.getElementById("refreshFilesButton");
 
       let selectedFiles = [];
 
@@ -285,6 +312,62 @@
           units[index]
         );
       }
+
+      async function loadSavedFiles() {
+        savedFilesStatus.textContent = "Loading your files...";
+        savedFilesList.innerHTML = "";
+
+        try {
+          const response = await fetch("/files");
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Could not load files.");
+          }
+
+          if (result.files.length === 0) {
+            savedFilesStatus.textContent = "No files uploaded yet.";
+            return;
+          }
+
+          savedFilesStatus.textContent = `${result.files.length} file(s) stored`;
+
+          result.files.forEach((file) => {
+            const item = document.createElement("div");
+
+            item.className =
+              "flex items-center justify-between gap-4 px-5 py-4";
+
+            const details = document.createElement("div");
+            details.className = "min-w-0";
+
+            const name = document.createElement("p");
+            name.className = "font-medium text-gray-800 break-words";
+            name.textContent = file.name;
+
+            const info = document.createElement("p");
+            info.className = "text-sm text-gray-500 mt-1";
+
+            const size = formatFileSize(file.size);
+            const date = new Date(file.uploadedAt).toLocaleString();
+
+            info.textContent = `${size} · Uploaded ${date}`;
+
+            details.appendChild(name);
+            details.appendChild(info);
+            item.appendChild(details);
+
+            savedFilesList.appendChild(item);
+          });
+        } catch (error) {
+          savedFilesStatus.textContent = error.message;
+        }
+      }
+
+      refreshFilesButton.addEventListener("click", loadSavedFiles);
+
+      // Load saved files when the page opens.
+      loadSavedFiles();
 
       async function uploadSelectedFiles() {
         if (selectedFiles.length === 0) {
