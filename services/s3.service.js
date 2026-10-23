@@ -58,5 +58,6 @@ module.exports = {
     s3,
     uploadFile,
     getDownloadUrl,
+    deleteFile,
     BUCKET_NAME
 };

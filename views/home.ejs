@@ -1,177 +1,298 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Drive Clone</title>
-
-    <!-- Tailwind CSS -->
+    <title>DriveClone — File Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            },
+            colors: {
+              accent: {
+                DEFAULT: '#4f46e5',
+                hover: '#4338ca',
+                subtle: '#eef2ff',
+              }
+            }
+          }
+        }
+      }
+    </script>
   </head>
 
-  <body class="bg-gray-50 min-h-screen">
-    <!-- Hidden File Input -->
+  <body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-900">
+    <!-- Hidden File Input (Preserved functional ID) -->
     <input type="file" id="fileInput" class="hidden" multiple />
 
-    <!-- Navbar -->
-    <nav class="bg-white border-b border-gray-200">
-      <div
-        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
-      >
-        <!-- Logo -->
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white border-b border-zinc-200 sticky top-0 z-30">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand & Context -->
         <div class="flex items-center gap-3">
-          <div
-            class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 15a4 4 0 004 4h9a5 5 0 100-10h-1.26A8 8 0 103 15z"
-              />
-            </svg>
-          </div>
-
-          <h1 class="text-xl font-semibold text-gray-800">Drive Clone</h1>
+          <a href="/home" class="flex items-center gap-2.5 group">
+            <div class="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center text-white transition-transform group-hover:scale-95">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+              </svg>
+            </div>
+            <span class="font-semibold tracking-tight text-zinc-900 hidden sm:inline-block">DriveClone</span>
+          </a>
+          <div class="h-4 w-px bg-zinc-200 hidden sm:block"></div>
+          <span class="text-xs font-mono text-zinc-500 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded hidden md:inline-flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>AWS S3 · Private</span>
+          </span>
         </div>
 
-        <!-- Upload Button -->
-        <button
-          id="uploadButton"
-          type="button"
-          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg transition duration-200 shadow-sm"
-        >
-          <span class="text-lg">+</span>
-          Upload File
-        </button>
-        <form action="/user/logout" method="POST">
+        <!-- Quick Search Filter -->
+        <div class="flex-1 max-w-md mx-2">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Filter files by name or extension..."
+              class="w-full pl-8 pr-3 py-1.5 text-xs text-zinc-900 bg-zinc-50 hover:bg-zinc-100/80 focus:bg-white border border-zinc-200 rounded-md placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Actions & Logout -->
+        <div class="flex items-center gap-2.5">
+          <!-- Upload Button (Preserved ID) -->
           <button
-            type="submit"
-            class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            id="uploadButton"
+            type="button"
+            class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3.5 py-1.5 rounded-md text-xs shadow-xs transition-colors"
           >
-            Logout
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14m-7-7v14"/>
+            </svg>
+            <span>Upload</span>
           </button>
-        </form>
+
+          <!-- Logout Form (Preserved Action & Method) -->
+          <form action="/user/logout" method="POST" class="inline-block">
+            <button
+              type="submit"
+              title="Sign out"
+              class="inline-flex items-center gap-1.5 bg-white hover:bg-zinc-100 text-zinc-700 border border-zinc-200 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+            >
+              <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span class="hidden sm:inline">Sign Out</span>
+            </button>
+          </form>
+        </div>
+
       </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-10">
-      <!-- Heading -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800">My Drive</h2>
-
-        <p class="text-gray-500 mt-1">Upload and manage your files</p>
-      </div>
-
-      <!-- Drag & Drop Area -->
-      <div
-        id="dropArea"
-        class="w-full min-h-[400px] bg-white border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center hover:border-blue-400 transition duration-200 cursor-pointer"
-      >
-        <!-- Upload Icon -->
-        <div
-          class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5"
-        >
-          <svg
-            class="w-10 h-10 text-blue-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.8"
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 0116.9 6H17a4 4 0 010 8h-1m-6-4l3-3m0 0l3 3m-3-3v12"
-            />
-          </svg>
+    <!-- Main Workspace Container -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
+      
+      <!-- Top Overview Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-zinc-900">My Storage</h1>
+          <p class="text-xs text-zinc-500 mt-0.5">
+            Manage authenticated assets stored securely in your private cloud bucket.
+          </p>
         </div>
-
-        <!-- Main Text -->
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">
-          Drag & Drop your files here
-        </h3>
-
-        <p class="text-gray-500 mb-6">
-          or click the button below to browse your files
-        </p>
-
-        <!-- Browse Button -->
-        <button
-          id="browseButton"
-          type="button"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition duration-200"
-        >
-          Browse Files
-        </button>
-
-        <!-- File Information -->
-        <p class="text-sm text-gray-400 mt-5">You can upload multiple files</p>
-      </div>
-
-      <!-- Selected Files -->
-      <div id="fileList" class="mt-6 hidden">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Selected Files</h3>
-
-        <div
-          id="fileNames"
-          class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100"
-        ></div>
-      </div>
-
-      <div class="mt-4">
-        <button
-          id="confirmUploadButton"
-          type="button"
-          onclick="uploadSelectedFiles()"
-          class="hidden bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg"
-        >
-          Upload Selected Files
-        </button>
-      </div>
-
-      <!-- Files already saved in My Drive -->
-      <section class="mt-10">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-gray-800">My Files</h3>
-
+        <div class="flex items-center gap-2">
+          <!-- Refresh Files Button (Preserved ID) -->
           <button
             id="refreshFilesButton"
             type="button"
-            class="text-sm text-blue-600 hover:text-blue-800"
+            class="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-200 px-2.5 py-1.5 rounded-md shadow-xs transition-colors"
+            title="Reload files"
           >
-            Refresh
+            <svg id="refreshIcon" class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>
+            </svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Zone (Preserved ID: dropArea) -->
+      <section
+        id="dropArea"
+        class="group relative w-full bg-white border border-dashed border-zinc-300 hover:border-zinc-400 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors shadow-xs"
+      >
+        <!-- Icon -->
+        <div class="w-10 h-10 rounded-md bg-zinc-100 group-hover:bg-indigo-50 group-hover:text-indigo-600 text-zinc-500 flex items-center justify-center mb-3 transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M12 12v9m-4-4 4-4 4 4"/>
+          </svg>
+        </div>
+
+        <h3 class="text-sm font-semibold text-zinc-900 mb-1">
+          Drop files to upload, or <button id="browseButton" type="button" class="text-indigo-600 hover:text-indigo-700 underline font-medium">browse local system</button>
+        </h3>
+        <p class="text-xs text-zinc-500 max-w-sm">
+          Supports multiple file upload. Maximum limit 10 MB per file. Stored directly to private S3.
+        </p>
+      </section>
+
+      <!-- Selected Files Staging (Preserved IDs: fileList, fileNames, confirmUploadButton) -->
+      <div id="fileList" class="mt-4 hidden">
+        <div class="bg-white border border-zinc-200 rounded-lg p-4 shadow-xs">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-zinc-100">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-zinc-800">Files Ready for Upload</span>
+              <span id="stagedCountBadge" class="text-[11px] font-mono font-medium text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded">0 files</span>
+            </div>
+            <button id="clearStagedBtn" type="button" class="text-xs text-zinc-400 hover:text-rose-600 transition-colors">
+              Clear all
+            </button>
+          </div>
+
+          <!-- Staged files listing -->
+          <div id="fileNames" class="divide-y divide-zinc-100 max-h-56 overflow-y-auto"></div>
+
+          <!-- Upload Progress Bar (subtle skeleton / minimal progress) -->
+          <div id="uploadProgressContainer" class="mt-3 pt-3 border-t border-zinc-100 hidden">
+            <div class="flex items-center justify-between text-xs text-zinc-500 mb-1.5 font-mono">
+              <span id="uploadProgressText">Uploading...</span>
+              <span id="uploadProgressPercent">0%</span>
+            </div>
+            <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
+              <div id="uploadProgressBar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300 w-0"></div>
+            </div>
+          </div>
+
+          <!-- Confirm button -->
+          <div class="mt-3 pt-2 flex items-center justify-end gap-2">
+            <button
+              id="confirmUploadButton"
+              type="button"
+              onclick="uploadSelectedFiles()"
+              class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-md text-xs transition-colors shadow-xs disabled:opacity-50"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7-5-5-5 5m5-5v12"/>
+              </svg>
+              <span>Upload Selected Files</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Status Banner (Preserved ID: uploadStatus) -->
+      <div
+        id="uploadStatus"
+        class="mt-3 text-xs font-medium empty:hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <!-- Saved Files Section -->
+      <section class="mt-8">
+        <!-- Section Header with Meta -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-semibold text-zinc-900 uppercase tracking-wider">All Stored Files</h2>
+            <span id="savedFilesStatus" class="text-xs text-zinc-400 font-mono">
+              Loading...
+            </span>
+          </div>
+          <div id="storageSummary" class="text-xs text-zinc-500 font-mono hidden">
+            0 items
+          </div>
+        </div>
+
+        <!-- Files Table Container -->
+        <div class="bg-white border border-zinc-200 rounded-lg shadow-xs overflow-hidden">
+          
+          <!-- Table Header -->
+          <div class="hidden sm:grid sm:grid-cols-12 gap-3 px-4 py-2.5 bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-semibold text-zinc-400 tracking-wider font-mono">
+            <div class="col-span-6">NAME</div>
+            <div class="col-span-2">SIZE</div>
+            <div class="col-span-2">UPLOADED</div>
+            <div class="col-span-2 text-right">ACTIONS</div>
+          </div>
+
+          <!-- Saved Files List (Preserved ID: savedFilesList) -->
+          <div id="savedFilesList" class="divide-y divide-zinc-100">
+            <!-- Will be populated dynamically via loadSavedFiles() -->
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Custom Destructive Deletion Modal (No native alert or confirm) -->
+    <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-xs hidden transition-opacity">
+      <div class="bg-white border border-zinc-200 rounded-lg max-w-md w-full p-6 shadow-lg text-left" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 id="modalTitle" class="text-sm font-semibold text-zinc-900">
+              Permanently delete file?
+            </h3>
+            <p class="text-xs text-zinc-500 mt-1 leading-relaxed">
+              This action cannot be undone. The file object will be purged from AWS S3 and permanently erased from your database index.
+            </p>
+            <div class="mt-3 p-2 bg-zinc-50 rounded border border-zinc-200 font-mono text-xs text-zinc-700 truncate" id="deleteModalFileName">
+              filename.ext
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            id="cancelDeleteBtn"
+            class="px-3.5 py-2 text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-300 rounded-md transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="confirmDeleteBtn"
+            class="px-3.5 py-2 text-xs font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-md transition-colors shadow-xs inline-flex items-center gap-1.5"
+          >
+            <span id="confirmDeleteText">Delete File</span>
+            <svg id="deleteSpinner" class="w-3.5 h-3.5 animate-spin hidden" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
           </button>
         </div>
 
-        <p id="savedFilesStatus" class="text-sm text-gray-500 mb-3">
-          Loading your files...
-        </p>
+      </div>
+    </div>
 
-        <div
-          id="savedFilesList"
-          class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100"
-        ></div>
-      </section>
-    </main>
+    <!-- Minimal Workspace Footer -->
+    <footer class="border-t border-zinc-200 bg-white py-4 mt-12 text-xs text-zinc-400">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+        <span>DriveClone Cloud Object Interface</span>
+        <span class="font-mono">Status: Healthy</span>
+      </div>
+    </footer>
 
-    <!-- Upload Status -->
-    <p
-      id="uploadStatus"
-      class="max-w-7xl mx-auto px-6 mt-4 text-sm"
-      role="status"
-      aria-live="polite"
-    ></p>
-
-    <!-- JavaScript -->
+    <!-- JavaScript Preserving All Contracts and Enhancing Micro-interactions -->
     <script>
       const fileInput = document.getElementById("fileInput");
       const uploadButton = document.getElementById("uploadButton");
@@ -180,132 +301,174 @@
 
       const fileList = document.getElementById("fileList");
       const fileNames = document.getElementById("fileNames");
+      const confirmUploadButton = document.getElementById("confirmUploadButton");
+      const clearStagedBtn = document.getElementById("clearStagedBtn");
+      const stagedCountBadge = document.getElementById("stagedCountBadge");
+
       const uploadStatus = document.getElementById("uploadStatus");
       const savedFilesList = document.getElementById("savedFilesList");
       const savedFilesStatus = document.getElementById("savedFilesStatus");
       const refreshFilesButton = document.getElementById("refreshFilesButton");
+      const refreshIcon = document.getElementById("refreshIcon");
+      const searchInput = document.getElementById("searchInput");
+      const storageSummary = document.getElementById("storageSummary");
+
+      // Progress bar elements
+      const uploadProgressContainer = document.getElementById("uploadProgressContainer");
+      const uploadProgressBar = document.getElementById("uploadProgressBar");
+      const uploadProgressText = document.getElementById("uploadProgressText");
+      const uploadProgressPercent = document.getElementById("uploadProgressPercent");
+
+      // Delete Modal elements
+      const deleteModal = document.getElementById("deleteModal");
+      const deleteModalFileName = document.getElementById("deleteModalFileName");
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+      const confirmDeleteText = document.getElementById("confirmDeleteText");
+      const deleteSpinner = document.getElementById("deleteSpinner");
 
       let selectedFiles = [];
+      let cachedSavedFiles = [];
+      let pendingDeleteFile = null;
 
-      // Upload File button
+      // Upload button click
       uploadButton.addEventListener("click", () => {
         fileInput.click();
       });
 
-      // Browse Files button
+      // Browse button click
       browseButton.addEventListener("click", (event) => {
         event.stopPropagation();
         fileInput.click();
       });
 
-      // Clicking anywhere on drop area
+      // Drop area click
       dropArea.addEventListener("click", () => {
         fileInput.click();
       });
 
-      // Files selected from file picker
-
+      // File input change
       fileInput.addEventListener("change", () => {
         if (fileInput.files.length > 0) {
-          selectedFiles = Array.from(fileInput.files);
-          displayFiles(selectedFiles);
+          appendSelectedFiles(Array.from(fileInput.files));
           uploadStatus.textContent = "";
         }
       });
 
-      // Drag over
+      // Drag and Drop styling micro-interactions
       dropArea.addEventListener("dragover", (event) => {
         event.preventDefault();
-
-        dropArea.classList.remove("border-gray-300");
-        dropArea.classList.add("border-blue-500", "bg-blue-50");
+        dropArea.classList.remove("border-zinc-300");
+        dropArea.classList.add("border-indigo-500", "bg-indigo-50/40");
       });
 
-      // Drag leave
       dropArea.addEventListener("dragleave", () => {
-        dropArea.classList.remove("border-blue-500", "bg-blue-50");
-
-        dropArea.classList.add("border-gray-300");
+        dropArea.classList.remove("border-indigo-500", "bg-indigo-50/40");
+        dropArea.classList.add("border-zinc-300");
       });
 
-      // Drop files
       dropArea.addEventListener("drop", (event) => {
         event.preventDefault();
-
-        dropArea.classList.remove("border-blue-500", "bg-blue-50");
-
-        dropArea.classList.add("border-gray-300");
+        dropArea.classList.remove("border-indigo-500", "bg-indigo-50/40");
+        dropArea.classList.add("border-zinc-300");
 
         const files = event.dataTransfer.files;
-
         if (files.length > 0) {
-          selectedFiles = Array.from(files);
-          displayFiles(selectedFiles);
+          appendSelectedFiles(Array.from(files));
           uploadStatus.textContent = "";
         }
       });
 
-      // Display selected files
-      function displayFiles(files) {
+      function appendSelectedFiles(newFiles) {
+        // Filter out duplicates by name and size
+        newFiles.forEach((newFile) => {
+          const exists = selectedFiles.some(
+            (f) => f.name === newFile.name && f.size === newFile.size
+          );
+          if (!exists) {
+            selectedFiles.push(newFile);
+          }
+        });
+        renderSelectedFiles();
+      }
+
+      function removeSelectedFile(index) {
+        selectedFiles.splice(index, 1);
+        renderSelectedFiles();
+      }
+
+      clearStagedBtn.addEventListener("click", () => {
+        selectedFiles = [];
+        fileInput.value = "";
+        renderSelectedFiles();
+      });
+
+      // Render Selected Files Staging
+      function renderSelectedFiles() {
         fileNames.innerHTML = "";
 
+        if (selectedFiles.length === 0) {
+          fileList.classList.add("hidden");
+          confirmUploadButton.classList.add("hidden");
+          stagedCountBadge.textContent = "0 files";
+          return;
+        }
+
         fileList.classList.remove("hidden");
+        confirmUploadButton.classList.remove("hidden");
+        stagedCountBadge.textContent = `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`;
 
-        document
-          .getElementById("confirmUploadButton")
-          .classList.remove("hidden");
+        let totalBytes = 0;
 
-        Array.from(files).forEach((file) => {
+        selectedFiles.forEach((file, index) => {
+          totalBytes += file.size;
           const fileItem = document.createElement("div");
-
-          fileItem.className = "flex items-center justify-between px-5 py-4";
+          fileItem.className = "flex items-center justify-between py-2.5 px-2 hover:bg-zinc-50 rounded transition-colors text-xs";
 
           fileItem.innerHTML = `
-                    <div class="flex items-center gap-3">
-
-                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-
-                            <svg
-                                class="w-5 h-5 text-blue-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                            </svg>
-
-                        </div>
-
-                        <div>
-                            <p class="font-medium text-gray-800">
-                                ${file.name}
-                            </p>
-
-                            <p class="text-sm text-gray-400">
-                                ${formatFileSize(file.size)}
-                            </p>
-                        </div>
-
-                    </div>
-                `;
+            <div class="flex items-center gap-2.5 min-w-0 pr-3">
+              <div class="w-7 h-7 rounded bg-zinc-100 text-zinc-600 flex items-center justify-center shrink-0">
+                ${getFileIconSvg(file.name, file.type)}
+              </div>
+              <div class="min-w-0">
+                <p class="font-medium text-zinc-800 truncate">${escapeHtml(file.name)}</p>
+                <p class="text-[11px] text-zinc-400 font-mono">${formatFileSize(file.size)}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="removeSelectedFile(${index})"
+              title="Remove file"
+              class="text-zinc-400 hover:text-rose-600 p-1 rounded transition-colors"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          `;
 
           fileNames.appendChild(fileItem);
         });
+
+        confirmUploadButton.innerHTML = `
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7-5-5-5 5m5-5v12"/>
+          </svg>
+          <span>Upload ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''} (${formatFileSize(totalBytes)})</span>
+        `;
+      }
+
+      // Backward compatible displayFiles function
+      function displayFiles(files) {
+        selectedFiles = Array.from(files);
+        renderSelectedFiles();
       }
 
       // Format file size
       function formatFileSize(bytes) {
-        if (bytes === 0) return "0 Bytes";
-
-        const units = ["Bytes", "KB", "MB", "GB"];
-
+        if (!bytes || bytes === 0) return "0 Bytes";
+        const units = ["Bytes", "KB", "MB", "GB", "TB"];
         const index = Math.floor(Math.log(bytes) / Math.log(1024));
-
         return (
           parseFloat((bytes / Math.pow(1024, index)).toFixed(2)) +
           " " +
@@ -313,9 +476,106 @@
         );
       }
 
+      // File icons generator based on extension & mime
+      function getFileIconSvg(filename, mimeType) {
+        const ext = (filename.split('.').pop() || '').toLowerCase();
+        
+        // PDF
+        if (ext === 'pdf' || (mimeType && mimeType.includes('pdf'))) {
+          return `<svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>`;
+        }
+        // Images
+        if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext) || (mimeType && mimeType.startsWith('image/'))) {
+          return `<svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+          </svg>`;
+        }
+        // Code & Data
+        if (['js', 'ts', 'jsx', 'tsx', 'json', 'yaml', 'yml', 'html', 'css', 'py', 'sh', 'env', 'sql', 'c', 'cpp'].includes(ext)) {
+          return `<svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>`;
+        }
+        // Archives
+        if (['zip', 'tar', 'gz', 'rar', '7z', 'bz2'].includes(ext) || (mimeType && mimeType.includes('zip'))) {
+          return `<svg class="w-4 h-4 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>`;
+        }
+        // Audio & Video
+        if (['mp4', 'mov', 'mkv', 'avi', 'mp3', 'wav', 'ogg'].includes(ext) || (mimeType && (mimeType.startsWith('video/') || mimeType.startsWith('audio/')))) {
+          return `<svg class="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>`;
+        }
+        // Default Document
+        return `<svg class="w-4 h-4 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>`;
+      }
+
+      function escapeHtml(string) {
+        if (!string) return '';
+        return String(string)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Show Skeleton Loaders during fetch
+      function showSkeletons() {
+        savedFilesList.innerHTML = `
+          <div class="px-4 py-3.5 flex items-center justify-between animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded bg-zinc-200"></div>
+              <div class="space-y-1.5">
+                <div class="w-44 h-3 bg-zinc-200 rounded"></div>
+                <div class="w-20 h-2 bg-zinc-100 rounded"></div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+            </div>
+          </div>
+          <div class="px-4 py-3.5 flex items-center justify-between animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded bg-zinc-200"></div>
+              <div class="space-y-1.5">
+                <div class="w-56 h-3 bg-zinc-200 rounded"></div>
+                <div class="w-24 h-2 bg-zinc-100 rounded"></div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+            </div>
+          </div>
+          <div class="px-4 py-3.5 flex items-center justify-between animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded bg-zinc-200"></div>
+              <div class="space-y-1.5">
+                <div class="w-36 h-3 bg-zinc-200 rounded"></div>
+                <div class="w-20 h-2 bg-zinc-100 rounded"></div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+              <div class="w-16 h-6 bg-zinc-100 rounded"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Fetch and display saved files
       async function loadSavedFiles() {
-        savedFilesStatus.textContent = "Loading your files...";
-        savedFilesList.innerHTML = "";
+        refreshIcon.classList.add("animate-spin");
+        savedFilesStatus.textContent = "Syncing...";
+        showSkeletons();
 
         try {
           const response = await fetch("/files");
@@ -325,83 +585,247 @@
             throw new Error(result.message || "Could not load files.");
           }
 
-          if (result.files.length === 0) {
-            savedFilesStatus.textContent = "No files uploaded yet.";
-            return;
-          }
+          cachedSavedFiles = result.files || [];
+          renderSavedFilesList(cachedSavedFiles);
 
-          savedFilesStatus.textContent = `${result.files.length} file(s) stored`;
-
-          result.files.forEach((file) => {
-            const item = document.createElement("div");
-
-            item.className =
-              "flex items-center justify-between gap-4 px-5 py-4";
-
-            // File details
-            const details = document.createElement("div");
-            details.className = "min-w-0";
-
-            const name = document.createElement("p");
-            name.className = "font-medium text-gray-800 break-words";
-            name.textContent = file.name;
-
-            const info = document.createElement("p");
-            info.className = "text-sm text-gray-500 mt-1";
-
-            const size = formatFileSize(file.size);
-            const date = new Date(file.uploadedAt).toLocaleString();
-
-            info.textContent = `${size} · Uploaded ${date}`;
-
-            details.appendChild(name);
-            details.appendChild(info);
-
-            // Download button
-            const downloadButton = document.createElement("button");
-            downloadButton.type = "button";
-            downloadButton.className =
-              "shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700";
-            downloadButton.textContent = "Download";
-
-            downloadButton.addEventListener("click", () => {
-              window.location.href = `/files/${encodeURIComponent(file.id)}/download`;
-            });
-
-            // Add details and button to the file row
-            item.appendChild(details);
-            item.appendChild(downloadButton);
-
-            savedFilesList.appendChild(item);
-          });
         } catch (error) {
+          console.error("Load files error:", error);
           savedFilesStatus.textContent = error.message;
+          savedFilesList.innerHTML = `
+            <div class="py-10 text-center text-xs text-rose-600">
+              <p>Failed to retrieve files: ${escapeHtml(error.message)}</p>
+              <button onclick="loadSavedFiles()" class="mt-2 text-indigo-600 underline font-medium">Try again</button>
+            </div>
+          `;
+        } finally {
+          refreshIcon.classList.remove("animate-spin");
         }
       }
 
-      // Refresh button
-      refreshFilesButton.addEventListener("click", loadSavedFiles);
+      // Render file rows
+      function renderSavedFilesList(files) {
+        savedFilesList.innerHTML = "";
 
-      // Load saved files when the page opens
-      loadSavedFiles();
+        if (!files || files.length === 0) {
+          savedFilesStatus.textContent = "0 files stored";
+          storageSummary.classList.add("hidden");
 
-      async function uploadSelectedFiles() {
-        if (selectedFiles.length === 0) {
-          uploadStatus.textContent = "Please select at least one file.";
-          uploadStatus.className =
-            "max-w-7xl mx-auto px-6 mt-4 text-sm text-red-600";
+          savedFilesList.innerHTML = `
+            <div class="py-16 px-4 text-center">
+              <div class="w-10 h-10 rounded-md bg-zinc-100 text-zinc-400 mx-auto flex items-center justify-center mb-3">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-zinc-800">Drop your first file here</h3>
+              <p class="text-xs text-zinc-500 mt-1 max-w-sm mx-auto">
+                No files uploaded yet. Drag and drop any document or asset into the upload zone above to get started.
+              </p>
+              <button
+                type="button"
+                onclick="fileInput.click()"
+                class="mt-4 inline-flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition-colors"
+              >
+                Browse Files
+              </button>
+            </div>
+          `;
           return;
         }
 
+        let totalBytes = 0;
+        files.forEach(f => { totalBytes += (f.size || 0); });
+
+        savedFilesStatus.textContent = `${files.length} file${files.length > 1 ? 's' : ''}`;
+        storageSummary.textContent = `${formatFileSize(totalBytes)} total storage`;
+        storageSummary.classList.remove("hidden");
+
+        files.forEach((file) => {
+          const item = document.createElement("div");
+          item.className = "group px-4 py-3 sm:grid sm:grid-cols-12 gap-3 items-center hover:bg-zinc-50 transition-colors";
+
+          const formattedDate = file.uploadedAt 
+            ? new Date(file.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+            : 'Unknown';
+
+          item.innerHTML = `
+            <!-- File Name & Icon -->
+            <div class="sm:col-span-6 flex items-center gap-3 min-w-0 pr-2">
+              <div class="w-7 h-7 rounded bg-zinc-100 flex items-center justify-center shrink-0">
+                ${getFileIconSvg(file.name, file.mimeType)}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-medium text-zinc-900 truncate" title="${escapeHtml(file.name)}">
+                  ${escapeHtml(file.name)}
+                </p>
+                <div class="sm:hidden flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5 font-mono">
+                  <span>${formatFileSize(file.size)}</span>
+                  <span>&middot;</span>
+                  <span>${formattedDate}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Size -->
+            <div class="hidden sm:block sm:col-span-2 text-xs font-mono text-zinc-600">
+              ${formatFileSize(file.size)}
+            </div>
+
+            <!-- Upload Date -->
+            <div class="hidden sm:block sm:col-span-2 text-xs text-zinc-400 font-sans">
+              ${formattedDate}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-2 sm:mt-0 sm:col-span-2 flex items-center justify-end gap-1.5">
+              <!-- Download Button -->
+              <button
+                type="button"
+                data-action="download"
+                class="inline-flex items-center gap-1 text-xs text-zinc-700 hover:text-indigo-600 bg-white hover:bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded transition-colors"
+                title="Download file"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m-5-4-4 4-4-4m4 4V3"/>
+                </svg>
+                <span class="hidden md:inline">Download</span>
+              </button>
+
+              <!-- Delete Button (Triggers custom modal) -->
+              <button
+                type="button"
+                data-action="delete"
+                class="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-rose-600 bg-white hover:bg-rose-50 border border-zinc-200 hover:border-rose-200 px-2 py-1 rounded transition-colors"
+                title="Delete file"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          `;
+
+          // Download event listener
+          const dlBtn = item.querySelector('[data-action="download"]');
+          dlBtn.addEventListener("click", () => {
+            window.location.href = `/files/${encodeURIComponent(file.id)}/download`;
+          });
+
+          // Delete event listener triggering custom modal
+          const delBtn = item.querySelector('[data-action="delete"]');
+          delBtn.addEventListener("click", () => {
+            openDeleteModal(file);
+          });
+
+          savedFilesList.appendChild(item);
+        });
+      }
+
+      // Live search filter input
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+          renderSavedFilesList(cachedSavedFiles);
+          return;
+        }
+
+        const filtered = cachedSavedFiles.filter((f) =>
+          f.name.toLowerCase().includes(query)
+        );
+        renderSavedFilesList(filtered);
+      });
+
+      // Custom Delete Modal Handlers (Strictly avoiding native confirm)
+      function openDeleteModal(file) {
+        pendingDeleteFile = file;
+        deleteModalFileName.textContent = file.name;
+        deleteModal.classList.remove("hidden");
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteText.textContent = "Delete File";
+        deleteSpinner.classList.add("hidden");
+      }
+
+      function closeDeleteModal() {
+        deleteModal.classList.add("hidden");
+        pendingDeleteFile = null;
+      }
+
+      cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+      deleteModal.addEventListener("click", (e) => {
+        if (e.target === deleteModal) closeDeleteModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !deleteModal.classList.contains("hidden")) {
+          closeDeleteModal();
+        }
+      });
+
+      // Confirm Delete Handler
+      confirmDeleteBtn.addEventListener("click", async () => {
+        if (!pendingDeleteFile) return;
+
+        confirmDeleteBtn.disabled = true;
+        cancelDeleteBtn.disabled = true;
+        confirmDeleteText.textContent = "Deleting...";
+        deleteSpinner.classList.remove("hidden");
+
+        try {
+          const deleteResponse = await fetch(
+            `/files/${encodeURIComponent(pendingDeleteFile.id)}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const deleteResult = await deleteResponse.json();
+
+          if (!deleteResponse.ok) {
+            throw new Error(deleteResult.message || "Could not delete file.");
+          }
+
+          closeDeleteModal();
+          showNotification(`"${pendingDeleteFile.name}" deleted successfully.`, "success");
+          await loadSavedFiles();
+        } catch (error) {
+          console.error("Delete error:", error);
+          alert(error.message); // Fallback notice if modal error
+          confirmDeleteBtn.disabled = false;
+          cancelDeleteBtn.disabled = false;
+          confirmDeleteText.textContent = "Delete File";
+          deleteSpinner.classList.add("hidden");
+        }
+      });
+
+      // Refresh button event listener
+      refreshFilesButton.addEventListener("click", loadSavedFiles);
+
+      // Multi-file upload logic preserving endpoints & showing micro progress
+      async function uploadSelectedFiles() {
+        if (selectedFiles.length === 0) {
+          showNotification("Please select at least one file.", "error");
+          return;
+        }
+
+        confirmUploadButton.disabled = true;
         uploadButton.disabled = true;
-        uploadStatus.textContent = "Uploading files...";
-        uploadStatus.className =
-          "max-w-7xl mx-auto px-6 mt-4 text-sm text-blue-600";
+
+        uploadProgressContainer.classList.remove("hidden");
+        uploadProgressBar.style.width = "0%";
+        uploadProgressText.textContent = "Preparing upload...";
+        uploadProgressPercent.textContent = "0%";
 
         let successCount = 0;
         const failedFiles = [];
+        const total = selectedFiles.length;
 
-        for (const file of selectedFiles) {
+        for (let i = 0; i < total; i++) {
+          const file = selectedFiles[i];
+          uploadProgressText.textContent = `Uploading ${i + 1} of ${total}: ${file.name}`;
+          const currentPercent = Math.round(((i) / total) * 100);
+          uploadProgressBar.style.width = `${currentPercent}%`;
+          uploadProgressPercent.textContent = `${currentPercent}%`;
+
           const formData = new FormData();
           formData.append("file", file);
 
@@ -423,26 +847,49 @@
           }
         }
 
+        uploadProgressBar.style.width = "100%";
+        uploadProgressPercent.textContent = "100%";
+
+        setTimeout(() => {
+          uploadProgressContainer.classList.add("hidden");
+        }, 1200);
+
+        confirmUploadButton.disabled = false;
         uploadButton.disabled = false;
 
         if (failedFiles.length === 0) {
-          uploadStatus.textContent = `Successfully uploaded ${successCount} file(s)!`;
-          uploadStatus.className =
-            "max-w-7xl mx-auto px-6 mt-4 text-sm text-green-600";
+          showNotification(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}!`, "success");
 
           selectedFiles = [];
           fileInput.value = "";
-          fileList.classList.add("hidden");
-          fileNames.innerHTML = "";
-          document
-            .getElementById("confirmUploadButton")
-            .classList.add("hidden");
+          renderSelectedFiles();
+          await loadSavedFiles();
         } else {
-          uploadStatus.textContent = `Uploaded ${successCount} file(s). Failed: ${failedFiles.join(" | ")}`;
-          uploadStatus.className =
-            "max-w-7xl mx-auto px-6 mt-4 text-sm text-red-600";
+          showNotification(
+            `Uploaded ${successCount} file(s). Failed: ${failedFiles.join(" | ")}`,
+            "error"
+          );
+          await loadSavedFiles();
         }
       }
+
+      function showNotification(msg, type) {
+        uploadStatus.textContent = msg;
+        uploadStatus.className =
+          type === "success"
+            ? "mt-3 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800"
+            : "mt-3 p-3 rounded-md bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800";
+        
+        setTimeout(() => {
+          if (uploadStatus.textContent === msg) {
+            uploadStatus.textContent = "";
+            uploadStatus.className = "mt-3 text-xs font-medium empty:hidden";
+          }
+        }, 6000);
+      }
+
+      // Initial load
+      loadSavedFiles();
     </script>
   </body>
 </html>

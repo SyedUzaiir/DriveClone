@@ -7,6 +7,7 @@ dotenv.config();
 const connectToDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const indexRouter = require('./routes/index.routes');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -26,6 +27,17 @@ app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
 
 // Routes
 app.get('/', (req, res) => {
+    const token = req.cookies?.token;
+
+    if (token) {
+        try {
+            jwt.verify(token, process.env.JWT_SECRET);
+            return res.redirect('/home');
+        } catch (err) {
+            // Token is invalid or expired; fall through to landing page
+        }
+    }
+
     res.render('index');
 });
 

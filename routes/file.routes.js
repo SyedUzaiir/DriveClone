@@ -8,7 +8,8 @@ const authMiddleware = require('../middleware/auth.middleware');
 const File = require('../models/file.model');
 const {
     uploadFile,
-    getDownloadUrl
+    getDownloadUrl,
+    deleteFile
 } = require('../services/s3.service');
 
 const router = express.Router();
@@ -180,6 +181,51 @@ router.get('/:id/download', authMiddleware, async (req, res) => {
 
         return res.status(500).json({
             message: 'Unable to download file.'
+        });
+    }
+});
+
+
+/**
+ * Delete a file owned by the authenticated user.
+ * DELETE /files/:id
+ */
+router.delete('/:id', authMiddleware, async (req, res) => {
+    try {
+        const file = await File.findOne({
+            _id: req.params.id,
+            owner: req.user.userId
+        });
+
+        if (!file) {
+            return res.status(404).json({
+                message: 'File not found.'
+            });
+        }
+
+        // Delete the actual file from S3 first.
+        await deleteFile({
+            key: file.s3Key
+        });
+
+        // Delete metadata only after the S3 operation succeeds.
+        await file.deleteOne();
+
+        return res.status(200).json({
+            message: 'File deleted successfully.',
+            id: file._id
+        });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(404).json({
+                message: 'File not found.'
+            });
+        }
+
+        console.error('File deletion error:', error.message);
+
+        return res.status(500).json({
+            message: 'Unable to delete file.'
         });
     }
 });

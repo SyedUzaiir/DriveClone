@@ -1,11 +1,365 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DriveClone — Minimalist Cloud Storage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Anti-FOUT Theme Initializer (prevents theme flicker on page load) -->
+  <script>
+    if (
+      localStorage.getItem('theme') === 'dark' ||
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- Tailwind CSS CDN & Configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: '#4f46e5',
+              hover: '#4338ca',
+              subtle: '#eef2ff',
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-    <h1>hello world</h1>
+<body class="min-h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans antialiased flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-900 dark:selection:bg-indigo-950 dark:selection:text-indigo-200 transition-colors duration-150">
+
+  <!-- Top Navigation -->
+  <header class="border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm sticky top-0 z-40 transition-colors duration-150">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <!-- Brand -->
+      <a href="/" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-md bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 transition-transform group-hover:scale-95">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+          </svg>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">DriveClone</span>
+          <span class="text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-1.5 py-0.5 rounded">v1.0</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Actions & Theme Toggle -->
+      <nav class="flex items-center gap-2 sm:gap-3">
+        <!-- Minimalist Sun/Moon Theme Toggle Button -->
+        <button
+          id="themeToggleBtn"
+          type="button"
+          aria-label="Toggle theme"
+          class="p-2 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 transition-colors"
+          title="Toggle light/dark mode"
+        >
+          <!-- Sun icon (visible in dark mode) -->
+          <svg id="sunIcon" class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+          </svg>
+          <!-- Moon icon (visible in light mode) -->
+          <svg id="moonIcon" class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+
+        <a href="/user/login" class="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 px-3 py-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors">
+          Sign In
+        </a>
+        <a href="/user/register" class="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md shadow-sm transition-all hover:shadow">
+          Get Started
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Hero Content -->
+  <main class="flex-1">
+    <!-- Hero Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16">
+      <div class="max-w-3xl">
+        <!-- Status Badge -->
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-6 shadow-xs transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span>AWS S3 Presigned Streaming · Atomic Metadata</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-[1.1]">
+          Engineered for fast, reliable object storage.
+        </h1>
+
+        <!-- Subheadline / Value Proposition -->
+        <p class="mt-6 text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl">
+          A high-density cloud file platform built on AWS S3 and MongoDB. Upload directly, stream securely via presigned links, and manage your assets with precision. Zero bloat, zero distractions.
+        </p>
+
+        <!-- CTA Group -->
+        <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <a href="/user/register" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-md shadow-sm transition-colors text-sm">
+            <span>Create Free Account</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14m-7-7 7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="/user/login" class="inline-flex items-center justify-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 font-medium px-5 py-2.5 rounded-md transition-colors text-sm shadow-xs">
+            <span>Sign In to Dashboard</span>
+          </a>
+        </div>
+
+        <!-- Technical Credibility Indicators -->
+        <div class="mt-10 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+          <div class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>SHA-256 S3 Key Isolation</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span>HTTP-Only JWT Authentication</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-700 dark:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m14-7-5-5-5 5m5-5v12"/>
+            </svg>
+            <span>10 MB In-Memory Stream Buffer</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abstract Representation of File Management (Pure CSS/Tailwind UI Blueprint) -->
+      <div class="mt-14 w-full">
+        <div class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors">
+          <!-- Mock Window Header -->
+          <div class="px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between transition-colors">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+              <span class="ml-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">driveclone://bucket/production/users/usr_94e2...</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>LIVE REPLICA</span>
+            </div>
+          </div>
+
+          <!-- Mock File Manager Content -->
+          <div class="p-4 sm:p-6">
+            <!-- Mock Toolbar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-zinc-100 dark:border-zinc-800">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-zinc-400 dark:text-zinc-500">PATH</span>
+                <span class="text-xs font-mono font-medium text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">/root/assets/</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                <span class="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 font-mono">4 items · 11.7 MB</span>
+              </div>
+            </div>
+
+            <!-- Mock Data Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="text-zinc-400 dark:text-zinc-500 border-b border-zinc-100 dark:border-zinc-800 font-medium">
+                    <th class="pb-2.5 font-medium">NAME</th>
+                    <th class="pb-2.5 font-medium hidden sm:table-cell">MIME TYPE</th>
+                    <th class="pb-2.5 font-medium">SIZE</th>
+                    <th class="pb-2.5 font-medium hidden md:table-cell">UPLOADED</th>
+                    <th class="pb-2.5 font-medium text-right">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">
+                  <!-- Row 1 -->
+                  <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <td class="py-3 pr-3 font-sans font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
+                      <div class="w-6 h-6 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </div>
+                      <span class="truncate">prod_infrastructure_v2.pdf</span>
+                    </td>
+                    <td class="py-3 hidden sm:table-cell text-zinc-500 dark:text-zinc-400">application/pdf</td>
+                    <td class="py-3 text-zinc-600 dark:text-zinc-300">2.42 MB</td>
+                    <td class="py-3 hidden md:table-cell text-zinc-400 dark:text-zinc-500 font-sans">Oct 23, 2026</td>
+                    <td class="py-3 text-right">
+                      <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-sans font-medium hover:underline cursor-pointer">
+                        Presign URL &rarr;
+                      </span>
+                    </td>
+                  </tr>
+                  <!-- Row 2 -->
+                  <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <td class="py-3 pr-3 font-sans font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
+                      <div class="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                      </div>
+                      <span class="truncate">k8s-cluster-manifest.yaml</span>
+                    </td>
+                    <td class="py-3 hidden sm:table-cell text-zinc-500 dark:text-zinc-400">text/yaml</td>
+                    <td class="py-3 text-zinc-600 dark:text-zinc-300">18.4 KB</td>
+                    <td class="py-3 hidden md:table-cell text-zinc-400 dark:text-zinc-500 font-sans">Oct 22, 2026</td>
+                    <td class="py-3 text-right">
+                      <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-sans font-medium hover:underline cursor-pointer">
+                        Presign URL &rarr;
+                      </span>
+                    </td>
+                  </tr>
+                  <!-- Row 3 -->
+                  <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <td class="py-3 pr-3 font-sans font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
+                      <div class="w-6 h-6 rounded bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                      </div>
+                      <span class="truncate">brand_assets_archive.zip</span>
+                    </td>
+                    <td class="py-3 hidden sm:table-cell text-zinc-500 dark:text-zinc-400">application/zip</td>
+                    <td class="py-3 text-zinc-600 dark:text-zinc-300">8.84 MB</td>
+                    <td class="py-3 hidden md:table-cell text-zinc-400 dark:text-zinc-500 font-sans">Oct 20, 2026</td>
+                    <td class="py-3 text-right">
+                      <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-sans font-medium hover:underline cursor-pointer">
+                        Presign URL &rarr;
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mock Bottom Stats -->
+            <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
+              <span>S3 REGION: eu-central-1</span>
+              <span>AWS_PRESIGNED_TTL: 3600s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
+          <div class="w-9 h-9 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 flex items-center justify-center mb-4">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Encrypted Direct Streaming</h3>
+          <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Downloads generate short-lived AWS S3 presigned URLs on the fly, eliminating server memory strain and securing direct client delivery.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
+          <div class="w-9 h-9 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 flex items-center justify-center mb-4">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M12 12v9m-4-4 4-4 4 4"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Atomic Lifecycle Ops</h3>
+          <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Every upload and deletion synchronizes S3 storage with MongoDB metadata atomically, guaranteeing no orphan objects remain.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
+          <div class="w-9 h-9 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 flex items-center justify-center mb-4">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Stateless Security</h3>
+          <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Protected by signed JSON Web Tokens sealed in HTTP-only cookies, combined with bcrypt-hardened credential hashing.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Developer Profile & Portfolio Footer -->
+  <footer class="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 transition-colors">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-400">
+      
+      <!-- Developer Credit & Product Info -->
+      <div class="flex flex-wrap items-center gap-2 text-center sm:text-left">
+        <span class="font-medium text-zinc-700 dark:text-zinc-300">DriveClone</span>
+        <span>&middot;</span>
+        <span>Built by <span class="font-medium text-zinc-700 dark:text-zinc-300">Syed Uzair Mohiuddin</span></span>
+      </div>
+
+      <!-- Links & GitHub Repository Link -->
+      <div class="flex items-center gap-5">
+        <a
+          href="https://github.com/SyedUzaiir/DriveClone"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-medium group"
+          title="View source on GitHub"
+        >
+          <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
+        <a href="/user/login" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Sign In</a>
+        <a href="/user/register" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Get Started</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Vanilla JavaScript for Theme Toggle with LocalStorage & MatchMedia -->
+  <script>
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // Listen for OS system theme changes if user hasn't explicitly set a preference
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!('theme' in localStorage)) {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    });
+  </script>
+
 </body>
 </html>

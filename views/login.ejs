@@ -1,55 +1,284 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — DriveClone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: '#4f46e5',
+              hover: '#4338ca',
+              subtle: '#eef2ff',
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body
-    class="bg-gray-100 dark:bg-gray-800"
->
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-  
-  <form action="/user/login" method="post" class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
+<body class="min-h-full bg-zinc-50 text-zinc-900 font-sans antialiased flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-900">
 
-    <h2 class="text-2xl font-semibold text-center mb-6">
-      Login Account
-    </h2>
-
-    <!-- Name -->
-    <div class="mb-4 w-full block">
-      <label class="block mb-1 text-sm font-medium">User Name</label>
-      <input 
-        type="text"
-        placeholder="John Doe"
-        class="block w-full px-4 py-2 border rounded-lg"
-        name="username"
-      />
+  <!-- Minimal Header -->
+  <header class="py-6 px-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2.5 group">
+        <div class="w-7 h-7 rounded-md bg-zinc-900 flex items-center justify-center text-white transition-transform group-hover:scale-95">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+          </svg>
+        </div>
+        <span class="font-semibold text-sm tracking-tight text-zinc-900">DriveClone</span>
+      </a>
+      <a href="/" class="text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1">
+        &larr; Back to overview
+      </a>
     </div>
+  </header>
 
-    <!-- Password -->
-    <div class="mb-6 w-full block">
-      <label class="block mb-1 text-sm font-medium">Password</label>
-      <input 
-        type="password"
-        placeholder="••••••••"
-        class="block w-full px-4 py-2 border rounded-lg"
-        name="password"
-      />
+  <!-- Centered Login Card -->
+  <main class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-sm">
+
+      <!-- Card Container -->
+      <div class="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 shadow-xs">
+        
+        <!-- Header -->
+        <div class="mb-6">
+          <h1 class="text-xl font-bold tracking-tight text-zinc-900">Sign in to your account</h1>
+          <p class="text-xs text-zinc-500 mt-1">
+            Enter your credentials to access your secure storage drive.
+          </p>
+        </div>
+
+        <!-- Inline Error Alert -->
+        <div id="errorAlert" class="hidden mb-5 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+          <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <div id="errorMessage" class="flex-1 font-medium leading-relaxed">
+            Invalid credentials.
+          </div>
+        </div>
+
+        <!-- Form preserving exact action, method, and input names -->
+        <form id="loginForm" action="/user/login" method="post" class="space-y-4">
+          <!-- Username -->
+          <div>
+            <label for="usernameInput" class="block text-xs font-medium text-zinc-700 mb-1.5">
+              Username
+            </label>
+            <div class="relative">
+              <input
+                id="usernameInput"
+                type="text"
+                name="username"
+                required
+                autocomplete="username"
+                placeholder="e.g. alexander"
+                class="block w-full px-3 py-2 text-sm text-zinc-900 bg-white border border-zinc-300 rounded-md placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 transition-colors"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="passwordInput" class="block text-xs font-medium text-zinc-700">
+                Password
+              </label>
+            </div>
+            <div class="relative">
+              <input
+                id="passwordInput"
+                type="password"
+                name="password"
+                required
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="block w-full px-3 py-2 pr-10 text-sm text-zinc-900 bg-white border border-zinc-300 rounded-md placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 transition-colors"
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 focus:outline-none"
+                aria-label="Toggle password visibility"
+              >
+                <svg id="eyeIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg id="eyeOffIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24m-2.12-6.12A10.7 10.7 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                  <line x1="2" y1="2" x2="22" y2="22"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-1">
+            <button
+              type="submit"
+              id="submitButton"
+              class="w-full inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <span id="buttonText">Sign In</span>
+              <svg id="buttonSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <!-- Divider -->
+        <div class="mt-6 pt-5 border-t border-zinc-100 text-center">
+          <p class="text-xs text-zinc-500">
+            Don't have an account?
+            <a href="/user/register" class="font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+              Create an account &rarr;
+            </a>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Trust note -->
+      <div class="mt-4 text-center">
+        <p class="text-[11px] text-zinc-400 font-mono">
+          Secured with 256-bit S3 object key isolation
+        </p>
+      </div>
+
     </div>
+  </main>
 
-    <!-- Button -->
-    <button class="w-full bg-blue-600 text-white py-2.5 rounded-lg">
-      Submit
-    </button>
+  <!-- Footer -->
+  <footer class="py-4 text-center text-xs text-zinc-400">
+    DriveClone &copy; 2026. All rights reserved.
+  </footer>
 
-  </form>
+  <!-- Frontend Logic -->
+  <script>
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const eyeOffIcon = document.getElementById('eyeOffIcon');
 
-</div>
+    togglePassword.addEventListener('click', () => {
+      const isPassword = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      eyeIcon.classList.toggle('hidden', isPassword);
+      eyeOffIcon.classList.toggle('hidden', !isPassword);
+    });
 
+    // Form submission with graceful error handling
+    const loginForm = document.getElementById('loginForm');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitButton = document.getElementById('submitButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonSpinner = document.getElementById('buttonSpinner');
+    const usernameInput = document.getElementById('usernameInput');
 
+    loginForm.addEventListener('submit', async (e) => {
+      // Use fetch for smooth error handling without navigating to raw JSON
+      e.preventDefault();
+      
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
 
-  <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+      if (!username || !password) {
+        showError('Please fill in both username and password.');
+        return;
+      }
+
+      setLoading(true);
+      hideError();
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        const response = await fetch('/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData.toString()
+        });
+
+        // If the server redirects on successful login (HTTP 302 redirected to /home)
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+
+        if (response.ok) {
+          // If 200 OK and redirected didn't fire, navigate to /home
+          window.location.href = '/home';
+          return;
+        }
+
+        // Handle error responses (status 400 or 500 JSON)
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          let errText = data.message || 'Invalid username or password.';
+          if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+            errText = data.errors.map(err => err.msg || err.message).join('. ');
+          }
+          showError(errText);
+        } else {
+          showError('Unable to sign in. Please check your credentials.');
+        }
+      } catch (err) {
+        console.error('Login submit error:', err);
+        showError('Network error. Please verify your connection.');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorAlert.classList.remove('hidden');
+      usernameInput.classList.add('border-rose-300');
+      passwordInput.classList.add('border-rose-300');
+    }
+
+    function hideError() {
+      errorAlert.classList.add('hidden');
+      usernameInput.classList.remove('border-rose-300');
+      passwordInput.classList.remove('border-rose-300');
+    }
+
+    function setLoading(isLoading) {
+      submitButton.disabled = isLoading;
+      if (isLoading) {
+        buttonText.textContent = 'Authenticating...';
+        buttonSpinner.classList.remove('hidden');
+      } else {
+        buttonText.textContent = 'Sign In';
+        buttonSpinner.classList.add('hidden');
+      }
+    }
+  </script>
+
 </body>
 </html>
