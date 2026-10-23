@@ -13,8 +13,9 @@
 
 ## 📌 Project Preview
 
-![DriveClone Dashboard](https://raw.githubusercontent.com/SyedUzaiir/DriveClone/main/assets/preview.png)
-*(Drop your preview screenshot or animated GIF at `./assets/preview.png`)*
+<p align="center">
+  <img src="./assets/preview.png" alt="DriveClone Interface Preview" width="100%" />
+</p>
 
 ---
 
